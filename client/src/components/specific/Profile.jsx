@@ -21,7 +21,7 @@ const Profile = () => {
           border: "5px solid white",
         }}
       />
-      <ProfileCard   heading={"Bio"} text={"dfascdsc dsc d"} />
+      <ProfileCard   heading={"Bio"} text={"Learing and acheving your goals"} />
       <ProfileCard
         heading={"Username"}
         text={"sujitkumar"}
