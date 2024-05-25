@@ -1,4 +1,4 @@
-import mongoose, { Schema, model } from "mongoose";
+import mongoose, { Schema, model,Types } from "mongoose";
 
 const schema=new Schema({
     content:String,
@@ -19,13 +19,13 @@ const schema=new Schema({
     sender: {
         type: Types.ObjectId,
         ref: "User",
-        required:ture,
+        required:true,
 
     },
     chat: {
         type: Types.ObjectId,
         ref: "Chat",
-        required: ture,
+        required: true,
     },
 },{
     timestamps:true,

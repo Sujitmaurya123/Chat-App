@@ -1,5 +1,6 @@
+
 import { User } from "../models/user.js";
-import {faker} from '@faker-js/faker'
+import { faker } from "@faker-js/faker";
 
 const createUser =async(numUsers)=>{
     try {
@@ -29,4 +30,7 @@ const createUser =async(numUsers)=>{
     }
 };
 
-export {createUser};
+
+
+export {createUser,
+    };
