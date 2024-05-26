@@ -11,13 +11,13 @@ const schema=new Schema({
     sender: {
         type: Types.ObjectId,
         ref: "User",
-        required: ture,
+        required: true,
 
     },
     receiver: {
         type: Types.ObjectId,
         ref: "Chat",
-        required: ture,
+        required: true,
     },
 },{
     timestamps:true,
