@@ -10,10 +10,11 @@ import { NEW_REQUEST } from '../constants/events.js';
 import {getOtherMember}from "../lib/helper.js"
 // create a new user and save it to the database and save token  in cookie
 
-const newUser=async(req,res,next)=>{
+const newUser=TryCatch(async(req,res,next)=>{
 
     const {name,username,password,bio}=req.body;
-
+    const file=req.file
+    if (!file) return next(new ErrorHandler("Please Upload Avatar"));
     const avatar={
         public_id:"Sdfsd",
         url:"asdfd",
@@ -28,7 +29,7 @@ const newUser=async(req,res,next)=>{
     });
 
    sendToken(res,user,201,"User created");
-}
+});
 
 
 // login user and save token in cookie
