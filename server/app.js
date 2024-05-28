@@ -12,8 +12,9 @@ import { Server } from "socket.io";
 import { createServer } from "http";
 import { NEW_MESSAGE,NEW_MESSAGE_ALERT } from "./constants/events.js";
 import { Message } from "./models/message.js";
+import cors from "cors";
 
-
+import {v2 as cloudinary } from 'cloudinary'
 
 dotenv.config({
     path:"./.env",
@@ -25,6 +26,12 @@ const port =process.env.PORT||3000
 const userSocketIDs = new Map(); 
 
 connectDB(mongoURI);
+
+cloudinary.config({
+    cloud_name:process.env.CLOUDINARY_CLOUD_NAME,
+    api_key:process.env.CLOUDINARY_API_KEY,
+    api_secret:process.env.CLOUDINARY_API_SECRET,
+});
 
 // createUser(10);
 // createSingleChats(10);
@@ -41,10 +48,31 @@ const io=new Server(server,{
 app.use(express.json());
 // app.use(express.urlencoded());
 app.use(cookieParser());
+// app.use(cors({
+//     origin: ["http://localhost:5173", "http://localhost:4173", process.env.CLIENT_URL,],
+//     credentials:true,
+   
+// }));
+const allowedOrigins = ["http://localhost:5173", "http://localhost:4173", process.env.CLIENT_URL];
 
-app.use("/user",userRoute);
-app.use("/chat", chatRoute);
-app.use("/admin",adminRoute);
+const corsOptions = {
+    origin: function (origin, callback) {
+        // Check if the origin is in the allowed list or if it's not defined (e.g., from Postman)
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true
+};
+
+app.use(cors(corsOptions));
+
+
+app.use("/api/v1/user",userRoute);
+app.use("/api/v1/chat", chatRoute);
+app.use("/api/v1/admin",adminRoute);
 
 app.get("/",(req,res)=>{
     res.send("Hello")
