@@ -6,7 +6,7 @@ import { cookieOptions, emitEvent, sendToken, uploadFilesToCloudinary } from '..
 import { TryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 import { Chat } from '../models/chat.js';
-import { NEW_REQUEST } from '../constants/events.js';
+import { NEW_REQUEST,REFETCH_CHATS } from '../constants/events.js';
 import {getOtherMember}from "../lib/helper.js"
 // create a new user and save it to the database and save token  in cookie
 
