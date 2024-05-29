@@ -4,7 +4,7 @@ import { Search as SearchIcon } from "@mui/icons-material";
 
 import { useInputValidation } from "6pp";
 import UserItem from '../shared/UserItem';
-import { sampleUsers } from '../../constants/sampleData.js';
+
 import { useDispatch, useSelector } from 'react-redux';
 import { setIsSearch } from '../../redux/reducers/misc.js';
 import { useLazySearchUserQuery, useSendFriendRequestMutation } from '../../redux/api/api.js';
@@ -14,13 +14,14 @@ import { useAsyncMutation } from '../../hooks/hook.jsx';
 
 const Search = () => {
   const dispatch=useDispatch();
-  const {isSearch}=useSelector(state=>state.misc);
+  const {isSearch}=useSelector((state)=>state.misc);
 
   const [searchUser]=useLazySearchUserQuery()
   const [sendFriendRequest,isLoadingSendFriendRequest]=useAsyncMutation(useSendFriendRequestMutation);
 
-  const [users,setUsers]=useState(sampleUsers)
+  const [users,setUsers]=useState([])
   const addFriendHandler=async(id)=>{
+    // console.log(id);
    await sendFriendRequest("Sending friend request...", { userId: id });
   }
   

@@ -102,13 +102,13 @@ const searchUser = TryCatch(async (req, res) => {
 
 const sendFriendRequest = TryCatch(async (req, res, next) => {
     const { userId } = req.body;
-
     const request = await Request.findOne({
         $or: [
             { sender: req.user, receiver: userId },
             { sender: userId, receiver: req.user },
         ],
     });
+   
 
     if (request) return next(new ErrorHandler("Request already sent", 400));
 
@@ -128,13 +128,13 @@ const sendFriendRequest = TryCatch(async (req, res, next) => {
 
 const acceptFriendRequest = TryCatch(async (req, res, next) => {
     const { requestId, accept } = req.body;
-
+    // console.log(requestId,accept);
     const request = await Request.findById(requestId)
         .populate("sender", "name")
         .populate("receiver", "name");
 
     if (!request) return next(new ErrorHandler("Request not found", 404));
-
+    // console.log(request)
     if (request.receiver._id.toString() !== req.user.toString())
         return next(
             new ErrorHandler("You are not authorized to accept this request", 401)
@@ -148,8 +148,9 @@ const acceptFriendRequest = TryCatch(async (req, res, next) => {
             message: "Friend Request Rejected",
         });
     }
-    const members = [request.sender._id, request.receiver._id];
 
+    const members = [request.sender._id, request.receiver._id];
+   
     await Promise.all([
         Chat.create({
             members,

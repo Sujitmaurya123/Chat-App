@@ -4,9 +4,6 @@ import { connectDB } from "./utils/features.js";
 import dotenv from "dotenv"
 import { errorMiddleware } from "./middlewares/error.js";
 import cookieParser from "cookie-parser";
-import userRoute from './routes/user.js'
-import chatRoute from './routes/chat.js'
-import adminRoute from './routes/admin.js'
 import { v4 as uuid } from "uuid";
 import { Server } from "socket.io";
 import { createServer } from "http";
@@ -15,6 +12,12 @@ import { Message } from "./models/message.js";
 import cors from "cors";
 
 import {v2 as cloudinary } from 'cloudinary'
+import { corsOptions } from "./constants/config.js";
+import { socketAuthenticator } from "./middlewares/auth.js";
+import userRoute from './routes/user.js'
+import chatRoute from './routes/chat.js'
+import adminRoute from './routes/admin.js'
+import { getSockets } from "./lib/helper.js";
 
 dotenv.config({
     path:"./.env",
@@ -41,7 +44,7 @@ cloudinary.config({
 const app=express();
 const server=createServer(app)
 const io=new Server(server,{
-    
+    cors:corsOptions,
 });
 
 // Using Middlewares Here
@@ -53,19 +56,7 @@ app.use(cookieParser());
 //     credentials:true,
    
 // }));
-const allowedOrigins = ["http://localhost:5173", "http://localhost:4173", process.env.CLIENT_URL];
 
-const corsOptions = {
-    origin: function (origin, callback) {
-        // Check if the origin is in the allowed list or if it's not defined (e.g., from Postman)
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true
-};
 
 app.use(cors(corsOptions));
 
@@ -79,13 +70,18 @@ app.get("/",(req,res)=>{
 })
 
 io.use((socket, next) => {
-   
+    cookieParser()(
+        socket.request,
+        socket.request.res,
+        async (err) => await socketAuthenticator(err, socket, next)
+    );
 });
 
 io.on("connection", (socket) => {
     const user = socket.user;
+    
     userSocketIDs.set(user._id.toString(), socket.id);
-    console.log("a user connected", socket.id)
+    // console.log(userSocketIDs)
     socket.on(NEW_MESSAGE, async ({ chatId, members, message }) => {
     const messageForRealTime = {
         content: message,
