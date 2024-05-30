@@ -1,21 +1,23 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import Header from './Header';
 import  Title  from '../shared/Title';
 import { Drawer, Grid, Skeleton } from '@mui/material';
 import ChatList from '../specific/ChatList';
 
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Profile from '../specific/Profile.jsx';
 import { useMyChatsQuery } from '../../redux/api/api.js';
 import { useDispatch, useSelector } from 'react-redux';
 import { setIsMobile } from '../../redux/reducers/misc.js';
 import { useErrors, useSocketEvents } from '../../hooks/hook.jsx';
 import { getSocket } from '../../socket.jsx';
-import {  NEW_MESSAGE_ALERT, NEW_REQUEST } from '../../constants/events.js';
+import {  NEW_MESSAGE_ALERT, NEW_REQUEST, REFETCH_CHATS } from '../../constants/events.js';
 import { incrementNotification, setNewMessagesAlert } from '../../redux/reducers/chat.js';
+import { getOrSaveFromStorage } from '../../lib/features.js';
 const AppLayout = () =>(WrappedComponent)=> {
     return (props)=>{
 
+      const navigate=useNavigate();
        const params=useParams();
        const dispatch=useDispatch();
        const chatId=params.chatId;
@@ -33,6 +35,10 @@ const AppLayout = () =>(WrappedComponent)=> {
 
       useErrors([{isError,error}]);
 
+      useEffect(()=>{
+        getOrSaveFromStorage({key:NEW_MESSAGE_ALERT,value:newMessagesAlert});
+      },[newMessagesAlert]);
+
        const handleDeleteChat=(e,_id,groupChat)=>{
         e.preventDefault();
         console.log("Delete Chat",_id,groupChat);
@@ -40,20 +46,28 @@ const AppLayout = () =>(WrappedComponent)=> {
        };
        const handleMobileClose=()=> dispatch(setIsMobile(false));
        const newMessageAlertHandler=useCallback((data)=>{
+        if(data.chatId===chatId)return;
               dispatch(setNewMessagesAlert(data))
         // const sds=data.chatId;
         //       console.log("Newmss",sds);
-       },[]);
+       },[chatId]);
 
        const newRequestHandler=useCallback(()=>{
         dispatch(incrementNotification());
 
        },[dispatch]);
+       const refetchListener=useCallback(()=>{
+       refetch();
+       navigate("/");
+
+       },[refetch,navigate]);
 
 
        const eventHandlers={
         [NEW_MESSAGE_ALERT]:newMessageAlertHandler,
         [NEW_REQUEST]:newRequestHandler,
+        [REFETCH_CHATS]:refetchListener,
+
        };
 
        useSocketEvents(socket,eventHandlers);

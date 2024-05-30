@@ -10,7 +10,7 @@ const initialState = {
         get: true,
     }) || [
             {
-                chatId: "",
+                chatId: "", 
                 count: 0,
             },
         ],

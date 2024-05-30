@@ -7,7 +7,7 @@ import cookieParser from "cookie-parser";
 import { v4 as uuid } from "uuid";
 import { Server } from "socket.io";
 import { createServer } from "http";
-import { NEW_MESSAGE,NEW_MESSAGE_ALERT } from "./constants/events.js";
+import { NEW_MESSAGE,NEW_MESSAGE_ALERT, START_TYPING, STOP_TYPING } from "./constants/events.js";
 import { Message } from "./models/message.js";
 import cors from "cors";
 
@@ -118,7 +118,16 @@ io.on("connection", (socket) => {
 
     
 
-    
+    socket.on(START_TYPING,({members,chatId})=>{
+        console.log("Start typing",chatId);
+        const membersSockets=getSockets(members);
+        socket.to(membersSockets).emit(START_TYPING,{chatId});
+    })
+    socket.on(STOP_TYPING, ({ members, chatId }) => {
+        console.log("Stop typing",chatId);
+        const membersSockets = getSockets(members);
+        socket.to(membersSockets).emit(STOP_TYPING, { chatId });
+    })
 
     socket.on("disconnect",()=>{
         console.log("user disconnected");
