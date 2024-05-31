@@ -97,9 +97,10 @@ const Chat = ({chatId,user}) => {
       }
 
     },[messages]);
+    
     useEffect(()=>{
-      if(!chatDetails.data?.chat)return navigate("/");
-    },[]);
+      if(chatDetails.isError)return navigate("/");
+    },[chatDetails.isError]);
 
   const newMessagesHandler=useCallback((data)=>{// newMessagesListener
     // console.log(data);
@@ -124,10 +125,11 @@ const Chat = ({chatId,user}) => {
   },[chatId]);
 
    const alertListener = useCallback(
-    (content) => {
+    (data) => {
+      if(data.chatId!==chatId)return;
       
       const messageForAlert = {
-        content,
+        content:data.message,
         sender: {
           _id: "djasdhajksdhasdsadasdas",
           name: "Admin",

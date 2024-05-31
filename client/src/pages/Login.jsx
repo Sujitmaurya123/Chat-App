@@ -14,6 +14,7 @@ import toast from 'react-hot-toast';
 const Login = () => {
 
     const [isLogin,setIsLogin]=useState(true);
+    const [isLoading,setIsLoading]=useState(false);
     const toggleLogin =()=>setIsLogin((prev)=>!prev)
     const name=useInputValidation("");
     const bio=useInputValidation("");
@@ -26,6 +27,8 @@ const Login = () => {
 
     const handleLogin=async(e)=>{
         e.preventDefault();
+        const toastId=toast.loading("Logging In...")
+        setIsLoading(true);
         const config={withCredentials:true,
             headers:{
                 'Content-Type':'application/json'
@@ -38,16 +41,21 @@ const Login = () => {
         },
            config 
         );
-        dispatch(userExists(true))
-        toast.success(data.message);
+        dispatch(userExists(data.user));
+        toast.success(data.message,{id:toastId});
         } catch (error) {
-            toast.error(error?.response?.data?.message||"Something Went Wrong")
+            toast.error(error?.response?.data?.message||"Something Went Wrong",
+                {id:toastId}
+            );
+        }finally{
+            setIsLoading(false);
         }
 
     }
     const handleSignUp=async(e)=>{
         e.preventDefault();
-
+        const toastId=toast.loading("Signing Up...")
+        setIsLoading(true);
         const formData=new FormData();
         formData.append("avatar",avatar.file);
         formData.append("name",name.value);
@@ -66,12 +74,14 @@ const Login = () => {
                 `${server}/api/v1/user/new`,formData,
                 config
             );
-            dispatch(userExists(true));
-            toast.success(data.message);
+            dispatch(userExists(data.user));
+            toast.success(data.message,{id:toastId});
         } catch (error) {
             toast.error(error?.response?.data?.message ||
-                "Something Went Wrong"
+                "Something Went Wrong",{id:toastId}
             );
+        }finally{
+            setIsLoading(false);
         }
         
     }
@@ -131,18 +141,19 @@ const Login = () => {
 
         <Button 
         sx={{
-            
+            margin:"1rem",
         }}
         fullWidth
         variant='contained'
         color='primary'
         type='submit'
+        disabled={isLoading}
         >
             Login
         </Button>
         <Typography textAlign={"center"} m={"1rem"}>Or</Typography>
         <Button
-        
+        disabled={isLoading}
         fullWidth
         variant='text'
        
@@ -257,6 +268,7 @@ const Login = () => {
         variant='contained'
         color='primary'
         type='submit'
+        disabled={isLoading}
         >
             Sign Up
         </Button>
@@ -265,6 +277,7 @@ const Login = () => {
         
         fullWidth
         variant='text'
+        disabled={isLoading}
        
         onClick={toggleLogin}
         >
