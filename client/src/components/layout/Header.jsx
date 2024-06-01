@@ -73,7 +73,7 @@ const Header = () => {
         sx={{
             display:{xs:"none",sm:"block"},
         }}
-        >Chattu</Typography>
+        >ChatApp</Typography>
 
         <Box  sx={{display:{xs:"block",sm:"none"}}}>
             <IconButton  color='inherit' onClick={handleMobile} >
